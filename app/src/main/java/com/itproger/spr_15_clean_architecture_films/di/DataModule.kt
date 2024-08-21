@@ -1,9 +1,11 @@
 package com.itproger.spr_15_clean_architecture_films.di
 
+import androidx.room.Room
 import data.network.IMDbApiService
 
 import data.NetworkClient
 import data.converters.MovieCastConverter
+import data.db.AppDatabase
 import data.network.RetrofitNetworkClient
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -26,5 +28,10 @@ val dataModule = module {
 
     single {
         MovieCastConverter()
+    }
+
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .build()
     }
 }

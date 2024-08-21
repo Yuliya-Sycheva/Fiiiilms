@@ -3,8 +3,10 @@ package presentation.details
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import domain.api.MoviesInteractor
 import domain.models.MovieDetails
+import kotlinx.coroutines.launch
 import ui.details.models.AboutState
 
 class AboutViewModel(
@@ -16,20 +18,23 @@ class AboutViewModel(
     fun observeAbout(): LiveData<AboutState> = aboutLiveData
 
     init {
-        moviesInteractor.getMovieDetails(movieId, object : MoviesInteractor.MovieDetailsConsumer {
-            override fun consume(movieDetails: MovieDetails?, errorMessage: String?) {
-                if (errorMessage != null) {
-                    renderState(AboutState.Error(errorMessage?: "Unknown error"))
-                } else {
-                    renderState(AboutState.Content(movieDetails))
-                }
+        viewModelScope.launch {
+            moviesInteractor.getMovieDetails(movieId).collect { pair ->
+                processResult(pair.first, pair.second)
             }
-        })
+        }
+    }
+
+    private fun processResult(movieDetails: MovieDetails?, errorMessage: String?) {
+        if (errorMessage != null) {
+            renderState(AboutState.Error(errorMessage ?: "Unknown error"))
+        } else {
+            renderState(AboutState.Content(movieDetails))
+        }
     }
 
     private fun renderState(state: AboutState) {
         aboutLiveData.postValue(state)
     }
-
 }
 

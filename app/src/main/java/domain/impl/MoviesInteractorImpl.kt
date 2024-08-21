@@ -2,6 +2,11 @@ package domain.impl
 
 import domain.api.MoviesInteractor
 import domain.api.MoviesRepository
+import domain.models.Movie
+import domain.models.MovieCast
+import domain.models.MovieDetails
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import utils.Resource
 import java.util.concurrent.Executors
 
@@ -9,43 +14,43 @@ class MoviesInteractorImpl (private val repository: MoviesRepository) : MoviesIn
 
     private val executor = Executors.newCachedThreadPool()
 
-    override fun findMovies(expression: String, consumer: MoviesInteractor.MoviesConsumer) {
-        executor.execute {
-            when (val resource = repository.findMovies(expression)) {
+    override fun findMovies(expression: String): Flow<Pair<List<Movie>?, String?>> {
+        return repository.findMovies(expression).map { result ->
+            when (result) {
                 is Resource.Success -> {
-                    consumer.consume(resource.data, null)
+                    Pair(result.data, null)
                 }
 
                 is Resource.Error -> {
-                    consumer.consume(null, resource.message)
+                    Pair(null, result.message)
                 }
             }
         }
     }
 
-    override fun getMovieDetails(movieId: String, consumer: MoviesInteractor.MovieDetailsConsumer) {
-        executor.execute {
-            when (val resource = repository.getMovieDetails(movieId)) {
+    override fun getMovieDetails(movieId: String): Flow<Pair<MovieDetails?, String?>> {
+        return repository.getMovieDetails(movieId).map { result ->
+            when (result) {
                 is Resource.Success -> {
-                    consumer.consume(resource.data, resource.message)
+                    Pair(result.data, result.message)
                 }
 
                 is Resource.Error -> {
-                    consumer.consume(resource.data, resource.message)
+                    Pair(result.data, result.message)
                 }
             }
         }
     }
 
-    override fun getFullCast(movieId: String, consumer: MoviesInteractor.MovieCastConsumer) {
-        executor.execute {
-            when (val resource = repository.getFullCast(movieId)) {
+    override fun getFullCast(movieId: String): Flow<Pair<MovieCast?, String?>> {
+        return repository.getFullCast(movieId).map { result ->
+            when (result) {
                 is Resource.Success -> {
-                    consumer.consume(resource.data, resource.message)
+                    Pair(result.data, result.message)
                 }
 
                 is Resource.Error -> {
-                    consumer.consume(resource.data, resource.message)
+                    Pair(result.data, result.message)
                 }
             }
         }

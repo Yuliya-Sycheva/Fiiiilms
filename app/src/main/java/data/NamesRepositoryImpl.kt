@@ -12,7 +12,7 @@ class NamesRepositoryImpl(private val networkClient: NetworkClient) : NamesRepos
 
     override fun getNames(expression: String): Flow<Resource<List<Person>>> = flow {
 
-        val response = networkClient.doRequestSuspend(NamesSearchRequest(expression))
+        val response = networkClient.doRequest(NamesSearchRequest(expression))
 
         when (response.resultCode) {
             -1 -> {

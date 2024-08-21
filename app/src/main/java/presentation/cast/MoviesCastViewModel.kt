@@ -3,11 +3,13 @@ package presentation.cast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import domain.api.MoviesInteractor
 import domain.models.MovieCast
+import kotlinx.coroutines.launch
 import ui.cast.models.CastState
 
-class MoviesCastViewModel (
+class MoviesCastViewModel(
     private val movieId: String,
     private val moviesInteractor: MoviesInteractor,
 ) : ViewModel() {
@@ -19,23 +21,26 @@ class MoviesCastViewModel (
 
         stateLiveData.postValue(CastState.Loading)
 
-        moviesInteractor.getFullCast(movieId, object : MoviesInteractor.MovieCastConsumer {
-
-            override fun consume(movieCast: MovieCast?, errorMessage: String?) {
-                if (movieCast != null) {
-                    renderState(castToUiStateContent(movieCast))
-                } else {
-                    renderState(CastState.Error(errorMessage ?: "Unknown error"))
-                }
+        viewModelScope.launch {
+            moviesInteractor.getFullCast(movieId).collect { pair ->
+                processResult(pair.first, pair.second)
             }
-        })
+        }
+    }
+
+    private fun processResult(movieCast: MovieCast?, errorMessage: String?) {
+        if (movieCast != null) {
+            renderState(castToUiStateContent(movieCast))
+        } else {
+            renderState(CastState.Error(errorMessage ?: "Unknown error"))
+        }
     }
 
     private fun renderState(state: CastState) {
         stateLiveData.postValue(state)
     }
 
-    private fun castToUiStateContent(cast: MovieCast) : CastState  {
+    private fun castToUiStateContent(cast: MovieCast): CastState {
 // Строим список элементов RecyclerView
         val items = buildList<MoviesCastRVItem> {
             // Если есть хотя бы один режиссёр, добавим заголовок

@@ -45,4 +45,10 @@
         android:id="@+id/infoFragment"
         android:name="ui.info.InfoFragment"
         android:label="InfoFragment" />
+
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="ui.history.HistoryFragment"
+        android:label="fragment_history"
+        tools:layout="@layout/fragment_history" />
 </navigation>
