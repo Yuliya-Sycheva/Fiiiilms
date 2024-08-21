@@ -53,8 +53,6 @@ class MoviesFragment : Fragment() {
 
     private var isClickAllowed = true
 
-    //  private val handler = Handler(Looper.getMainLooper())
-
     private val viewModel by viewModel<MoviesSearchViewModel>()
 
     private lateinit var binding: FragmentMoviesBinding
@@ -90,13 +88,6 @@ class MoviesFragment : Fragment() {
         adapter = MoviesAdapter { movie ->
             (activity as RootActivity).animateBottomNavigationView()
             onMovieClickDebounce(movie)
-//        if (clickDebounce()) {
-//
-//            findNavController().navigate(
-//                R.id.action_moviesFragment_to_detailsFragment,
-//                DetailsFragment.createArgs(movie.image, movie.id)
-//            )
-//        }
         }
 
         placeholderMessage = binding.placeholderMessage
@@ -141,24 +132,6 @@ class MoviesFragment : Fragment() {
         moviesList.adapter = null
         textWatcher?.let { queryInput.removeTextChangedListener(it) }
     }
-
-//    private fun clickDebounce(): Boolean { // Функция возвращает значение current, которое указывает, было ли нажатие разрешено в момент вызова функции (gpt)
-//        val current = isClickAllowed
-//        if (isClickAllowed) {
-//            isClickAllowed = false
-//            Log.d("myTAG", "isClickAllowed1 $isClickAllowed")
-//
-//            lifecycleScope.launch {  //Вместо использования viewLifecycleOwner.lifecycleScope, попробуйте использовать lifecycleScope фрагмента напрямую,
-//                // чтобы гарантировать, что корутина завершит выполнение своей работы, прежде чем фрагмент будет уничтожен
-//                delay(CLICK_DEBOUNCE_DELAY)
-//                isClickAllowed = true
-//                Log.d("myTAG", "isClickAllowed2 $isClickAllowed")
-//            }
-//            Log.d("myTAG", "isClickAllowed3 $isClickAllowed")
-//            //handler.postDelayed({ isClickAllowed = true }, MoviesFragment.CLICK_DEBOUNCE_DELAY)
-//        }
-//        return current
-//    }
 
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG)
